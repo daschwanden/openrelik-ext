@@ -2,10 +2,11 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as childProcess from 'child_process';
-import * as readline from 'readline';
 import("node-fetch");
 
 let dockerComposeStatus: 'running' | 'stopped' | 'unknown' = 'stopped';
+
+let workerTerminals: vscode.Terminal[] = [];
 
 async function checkHealth(url: string, timeout: number = 5000): Promise<boolean> {
     try {
@@ -73,6 +74,16 @@ function getWorkspaceRoot(): string | undefined {
     return workspaceFolder.uri.fsPath;
 }
 
+function getTerminal(name: string): vscode.Terminal | undefined {
+    const terminals = vscode.window.terminals;
+    for (const terminal of terminals) {
+      if (terminal.name === name) {
+        return terminal;
+      }
+    }
+    return undefined;
+}
+
 // This method is called when the extension is activated
 // The extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -125,7 +136,10 @@ export function activate(context: vscode.ExtensionContext) {
                 const stopItem = new vscode.TreeItem('Stop OpenRelik', vscode.TreeItemCollapsibleState.None);
                 stopItem.command = { command: 'openrelik.stopOpenRelik', title: 'Stop OpenRelik' };
                 stopItem.iconPath = new vscode.ThemeIcon('debug-stop');
-                return [stopItem];
+                const workerItem = new vscode.TreeItem('Create new worker', vscode.TreeItemCollapsibleState.None);
+                workerItem.command = { command: 'openrelik.newWorker', title: 'New Worker' };
+                workerItem.iconPath = new vscode.ThemeIcon('server-process');
+                return [stopItem, workerItem];
             } else if (dockerComposeStatus === 'unknown') {
                 const waitItem = new vscode.TreeItem('Waiting for OpenRelik', vscode.TreeItemCollapsibleState.None);
                 waitItem.command = { command: '', title: 'Waiting for OpenRelik...' };
@@ -189,37 +203,63 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
         }
         try {
-            const terminal = vscode.window.createTerminal("Stop OpenRelik");
+            var terminal = getTerminal("OpenRelik");
+            if (! terminal) {
+                terminal = vscode.window.createTerminal("Stop OpenRelik");
+            }
             terminal.show();
-            terminal.sendText(`cd ${devPath}/openrelik; docker compose down`);
+            terminal.sendText(`cd ${devPath}/openrelik; docker compose down; exit`);
             vscode.window.showInformationMessage('Stopping OpenRelik...');
             dockerComposeStatus = 'stopped';
             updateStatusBar(devPath);
             dockerComposeProvider.refresh();
+            for (const term of workerTerminals) {
+                term.dispose();
+            }
+            workerTerminals = [];
         } catch (error: any) {
             vscode.window.showErrorMessage(`Error stopping OpenRelik: ${error.message}`);
         }
     });
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('openrelik.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from OpenRelik!');
+	const newWorker = vscode.commands.registerCommand('openrelik.newWorker', async () => {
+        const workspacePath = getWorkspaceRoot();
+        const devPath = `${workspacePath}/openrelik-dev`;
+        const newWorkerScript = `${devPath}/newWorker.sh`;
+
+		if (dockerComposeStatus === 'running' && devPath) {
+            try {
+                // Use showInputBox to get user input
+                const userInput = await vscode.window.showInputBox({
+                    prompt: 'Please enter your input:',
+                    placeHolder: 'Type here...'
+                });
+                if (userInput) {
+                    console.log("User input:", userInput);
+                    for (const term of workerTerminals) {
+                        term.dispose();
+                    }
+                    workerTerminals = [];
+                    const terminal = vscode.window.createTerminal(`Worker: ${userInput}`);
+                    terminal.show();
+                    terminal.sendText(`cd ${devPath}; ${newWorkerScript} ${userInput}; cd ${devPath}/openrelik; docker compose watch`);
+                    vscode.window.showInformationMessage('Created new worker!');
+                    workerTerminals.push(terminal);
+                } else {
+                    // User cancelled the input
+                    vscode.window.showInformationMessage("Input cancelled.");
+                }
+            } catch (error: any) {
+                vscode.window.showErrorMessage(`Error creating new worker: ${error.message}`);
+            }  
+        } else {
+            vscode.window.showErrorMessage('OpenRelik must be running to create new worker');
+        }
 	});
 
-	const newWorker = vscode.commands.registerCommand('openrelik.newWorker', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('New worker!');
-	});
-
-	context.subscriptions.push(disposable);
-	context.subscriptions.push(newWorker);
 	context.subscriptions.push(startOpenRelik);
     context.subscriptions.push(stopOpenRelik);
+    context.subscriptions.push(newWorker);
     context.subscriptions.push(statusBarItem);
 
     const workspaceFolders = vscode.workspace.workspaceFolders;

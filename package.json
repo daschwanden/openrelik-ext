@@ -40,14 +40,6 @@
       }
     ],
     "commands": [
-      {
-        "command": "openrelik.helloWorld",
-        "title": "Hello World"
-      },
-      {
-        "command": "openrelik.newWorker",
-        "title": "Add new worker"
-      }
     ]
   },
   "scripts": {
