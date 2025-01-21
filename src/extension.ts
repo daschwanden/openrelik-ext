@@ -175,10 +175,10 @@ export function activate(context: vscode.ExtensionContext) {
             terminal.show();
             if (!fs.existsSync(devPath)) {
                 vscode.window.showWarningMessage('openrelik-dev folder not found, cloning the repo, then run start script.');
-                terminal.sendText(`git clone https://github.com/daschwanden/openrelik-dev.git; cd ${devPath}; ${startScript}`);
+                terminal.sendText(`git clone https://github.com/daschwanden/openrelik-dev.git && cd ${devPath} && ${startScript}`);
             } else {
                 vscode.window.showWarningMessage('openrelik-dev folder found, running start script.');
-                terminal.sendText(`cd ${devPath}; ${startScript}`);
+                terminal.sendText(`cd ${devPath} && ${startScript}`);
             }
             vscode.window.showInformationMessage('Starting OpenRelik...');
             dockerComposeStatus = 'unknown';
@@ -208,7 +208,7 @@ export function activate(context: vscode.ExtensionContext) {
                 terminal = vscode.window.createTerminal("Stop OpenRelik");
             }
             terminal.show();
-            terminal.sendText(`cd ${devPath}/openrelik; docker compose down; exit`);
+            terminal.sendText(`cd ${devPath}/openrelik && docker compose down; exit`);
             vscode.window.showInformationMessage('Stopping OpenRelik...');
             dockerComposeStatus = 'stopped';
             updateStatusBar(devPath);
@@ -242,7 +242,7 @@ export function activate(context: vscode.ExtensionContext) {
                     workerTerminals = [];
                     const terminal = vscode.window.createTerminal(`Worker: ${userInput}`);
                     terminal.show();
-                    terminal.sendText(`cd ${devPath}; ${newWorkerScript} ${userInput}; cd ${devPath}/openrelik; docker compose watch`);
+                    terminal.sendText(`cd ${devPath} && ${newWorkerScript} ${userInput} && cd ${devPath}/openrelik && docker compose watch`);
                     vscode.window.showInformationMessage('Created new worker!');
                     workerTerminals.push(terminal);
                 } else {
