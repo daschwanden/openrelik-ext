@@ -1,0 +1,16 @@
+services:
+  WORKER_NAME_HERE:
+      build: ../WORKER_NAME_HERE
+      container_name: WORKER_NAME_HERE
+      restart: always
+      environment:
+        - REDIS_URL=redis://openrelik-redis:6379
+      volumes:
+        - ../openrelik/data:/usr/share/openrelik/data
+        - /${HOME}/.config/gcloud:/root/.config/gcloud
+      command: "celery --app=src.app worker --task-events --concurrency=4 --loglevel=INFO -Q WORKER_NAME_HERE"
+      develop:
+        watch:
+          - action: sync+restart
+            path: ../WORKER_NAME_HERE/src
+            target: /openrelik/src

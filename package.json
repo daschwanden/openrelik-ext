@@ -1,13 +1,13 @@
 {
   "name": "openrelik",
-  "displayName": "openrelik",
+  "displayName": "OpenRelik",
   "description": "OpenRelik Extension",
-  "version": "0.0.2",
-  "engines": {
-    "vscode": "^1.96.0"
-  },
+  "version": "0.0.1",
   "publisher": "OpenRelik",
   "repository": "https://github.com/daschwanden/openrelik-ext",
+  "engines": {
+    "vscode": "^1.97.0"
+  },
   "categories": [
     "Other"
   ],
@@ -36,10 +36,18 @@
     "viewsWelcome": [
       {
         "view": "openrelik",
-        "contents": "OpenRelik not running [learn more](https://openrelik.org/getting-started/).\n[Start OpenRelik](command:openrelik.startOpenRelik)"
+        "contents": "OpenRelik not running [learn more](https://openrelik.org/getting-started/).\n[Start OpenRelik](command:openrelik.start)"
       }
     ],
     "commands": [
+      {
+        "command": "openrelik.helloWorld",
+        "title": "Hello World"
+      }
+    ],
+    "files": [
+      "out",
+      "scripts"
     ]
   },
   "scripts": {
@@ -51,15 +59,14 @@
     "test": "vscode-test"
   },
   "devDependencies": {
+    "@types/vscode": "^1.97.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
-    "@types/vscode": "^1.96.0",
-    "@typescript-eslint/eslint-plugin": "^8.17.0",
-    "@typescript-eslint/parser": "^8.17.0",
+    "@typescript-eslint/eslint-plugin": "^8.22.0",
+    "@typescript-eslint/parser": "^8.22.0",
+    "eslint": "^9.19.0",
+    "typescript": "^5.7.3",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1",
-    "eslint": "^9.16.0",
-    "node-fetch": "^3.3.2",
-    "typescript": "^5.7.2"
+    "@vscode/test-electron": "^2.4.1"
   }
 }

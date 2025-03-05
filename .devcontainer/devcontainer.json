@@ -1,7 +1,6 @@
 {
     "name": "Docker in Docker",
     "image": "mcr.microsoft.com/devcontainers/typescript-node:1-18-bullseye",
-
     "features": {
         "ghcr.io/devcontainers/features/docker-in-docker:2": {}
     },
@@ -12,11 +11,5 @@
             "target": "/home/node/.config/gcloud"
         }
     ],
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "/workspaces/openrelik-ext/openrelik-0.0.2.vsix"
-            ]
-        }
-    }
+    //"postCreateCommand": "curl -L -o openrelik-0.0.3.vsix https://github.com/daschwanden/openrelik-ext/openrelik-0.0.3.vsix && code --install-extension openrelik-0.0.3.vsix"
 }
