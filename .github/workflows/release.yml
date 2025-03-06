@@ -21,7 +21,7 @@ jobs:
           npm install -g @vscode/vsce
           npm install
       - name: Package Extension
-        run: vsce package --out openrelik-extension.vsix
+        run: vsce package --target linux-x64 linux-arm64 darwin-x64 darwin-arm64 --out openrelik-extension.vsix
       - name: Upload Extension as a release asset
         uses: actions/upload-release-asset@v1
         env:
