@@ -17,5 +17,4 @@ jobs:
       - run: npm install -g @vscode/vsce
       - run: ls -la
       - run: |
-          cd openrelik-ext
           vsce package
