@@ -6,15 +6,23 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "greet"
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install -g @vscode/vsce
-      - run: npm install
-      - run: |
-          vsce package
+      - name: Install packages
+        run: |
+          npm install -g @vscode/vsce
+          npm install
+      - name: Package Extension
+        run: vsce package --out openrelik-extension.vsix
+      - name: Upload Extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: openrelik-extension
+          path: openrelik-extension.vsix
