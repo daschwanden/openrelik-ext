@@ -21,8 +21,12 @@ jobs:
           npm install
       - name: Package Extension
         run: vsce package --out openrelik-extension.vsix
-      - name: Upload Extension
-        uses: actions/upload-artifact@v4
+      - name: Upload Extension as a release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: openrelik-extension
-          path: openrelik-extension.vsix
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: openrelik-extension.vsix
+          asset_name: openrelik-extension.vsix
+          asset_content_type: application/zip
