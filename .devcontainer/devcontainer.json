@@ -11,5 +11,5 @@
             "target": "/home/node/.config/gcloud"
         }
     ],
-    //"postCreateCommand": "curl -L -o openrelik-0.0.3.vsix https://github.com/daschwanden/openrelik-ext/openrelik-0.0.3.vsix && code --install-extension openrelik-0.0.3.vsix"
+    "postCreateCommand": "curl -s https://api.github.com/repos/daschwanden/openrelik-ext/releases/latest | grep 'browser_download_url.*vsix' | cut -d : -f 2,3 | tr -d \" | wget -qi - && code --install-extension openrelik-extension.vsix"
 }
