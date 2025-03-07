@@ -11,5 +11,5 @@
             "target": "/home/node/.config/gcloud"
         }
     ],
-    "postCreateCommand": "curl -s https://api.github.com/repos/daschwanden/openrelik-ext/releases/latest | grep 'browser_download_url.*vsix' | cut -d : -f 2,3 | tr -d \" | wget -qi - && code --install-extension openrelik-extension.vsix"
+    "postStartCommand": "bash scripts/install-extension.sh"
 }
